@@ -1,53 +1,42 @@
-from django.shortcuts import render
-from rest_framework.response import Response
+from django.views.generic.list import ListView
+from django.views.generic import DetailView
+from django.views.generic import UpdateView
+from django.views.generic import CreateView
+
+
 from .models import User
-from rest_framework.decorators import api_view
-from .serializers import UserSerializer
+
 
 # Create your views here.
 
+
 # Get all Users
+class GetUsers(ListView):
+    template_name = "user_list.html"
+    model = User
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
-@api_view(['GET'])
-def getUsers(request):
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
 
 # Get single User
 
-
-@api_view(['GET'])
-def getUser(request, pk):
-    user = User.objects.get(id=pk)
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
-
-# Update a User
+class GetUser(DetailView):
+    model = User
+    template_name = "single_user.html"
 
 
-@api_view(['PUT'])
-def updateUser(request, pk):
-    data = request.data
-    user = User.objects.get(id=pk)
-    serializer = UserSerializer(instance=user, data=data)
+# Update user
 
-    if serializer.is_valid():
-        serializer.save()
-    return Response(serializer.data)
+class UpdateUser(UpdateView):
+    model = User
+    fields = ('first_name', 'last_name', 'email', 'mobile')
+    template_name = "user_update.html"
 
 
 # Create a User
-@api_view(['POST'])
-def createUser(request):
-    data = request.data
-    user = User.objects.create(
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        password=data['password'],
-        user_email=data['user_email'],
-        user_mobile=data['user_mobile'],
-    )
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
+class CreateUser(CreateView):
+    model = User
+    fields = '__all__'
+    template_name = "create_user.html"

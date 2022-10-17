@@ -2,51 +2,39 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Barber
 from .serializers import BarberSerializer
+from django.views.generic.list import ListView
+from django.views.generic import DetailView
+from django.views.generic import UpdateView
+from django.views.generic import CreateView
 
 # Create your views here.
 
-# Get all barbers
+# Get all Barbers
 
 
-@api_view(['GET'])
-def getBarbers(request):
-    barbers = Barber.objects.all()
-    serializer = BarberSerializer(barbers, many=True)
-    return Response(serializer.data)
-
-# Get single barber
+class GetBarbers(ListView):
+    template_name = "barber_list.html"
+    model = Barber
 
 
-@api_view(['GET'])
-def getBarber(request, pk):
-    barber = Barber.objects.get(id=pk)
-    serializer = BarberSerializer(barber, many=False)
-    return Response(serializer.data)
+# Get single Barber
 
-# Update a Barber
+class GetBarber(DetailView):
+    model = Barber
+    template_name = "single_barber.html"
 
 
-@api_view(['PUT'])
-def updateBarber(request, pk):
-    data = request.data
-    barber = Barber.objects.get(id=pk)
-    serializer = BarberSerializer(instance=barber, data=data)
+# Update barber
 
-    if serializer.is_valid():
-        serializer.save()
-    return Response(serializer.data)
+class UpdateBarber(UpdateView):
+    model = Barber
+    fields = '__all__'
+
+    template_name = "barber_update.html"
 
 
 # Create a Barber
-
-@api_view(['POST'])
-def createBarber(request):
-    data = request.data
-    barber = Barber.objects.create(
-        barber_name=data['barber_name'],
-        barber_address=data['barber_address'],
-        barber_phone=data['barber_phone'],
-
-    )
-    serializer = BarberSerializer(barber, many=False)
-    return Response(serializer.data)
+class CreateBarber(CreateView):
+    model = Barber
+    fields = '__all__'
+    template_name = "create_barber.html"

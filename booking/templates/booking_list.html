@@ -1,0 +1,8 @@
+<h1>Bookings</h1>
+<ul>
+{% for booking in booking_list %}
+    <li>{{booking}} </li>
+{% empty %}
+    <li>No bookings yet</li>
+{% endfor %}
+</ul>

@@ -1,0 +1,8 @@
+<h1>Barbers</h1>
+<ul>
+{% for barber in barber_list %}
+    <li>{{ barber}} </li>
+{% empty %}
+    <li>No barbers yet</li>
+{% endfor %}
+</ul>

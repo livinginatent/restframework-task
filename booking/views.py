@@ -1,75 +1,60 @@
-from xmlrpc.client import DateTime
-from django.shortcuts import render
-from rest_framework.response import Response
 
-from user.models import User
+from django.views.generic.list import ListView
+from django.views.generic import DetailView
+from django.views.generic import UpdateView
+from django.views.generic import CreateView
+
+
 from barber.models import Barber
-from .models import Booking 
-from rest_framework.decorators import api_view
-from .serializers import BookingSerializer
+from user.models import User
+from .models import Booking
+
 
 # Create your views here.
+
 
 # Get all bookings
 
 
-@api_view(['GET'])
-def getBookings(request):
-    bookings = Booking.objects.all()
-    serializer = BookingSerializer(bookings, many=True)
-    return Response(serializer.data)
+class GetBookings(ListView):
+    template_name = "booking_list.html"
+    model = Booking
+
 
 # Get single booking
 
-
-@api_view(['GET'])
-def getBooking(request, pk):
-    booking = Booking.objects.get(id=pk)
-    serializer = BookingSerializer(booking, many=False)
-    return Response(serializer.data)
+class GetBooking(DetailView):
+    model = Booking
+    template_name = "single_booking.html"
 
 
 # Get bookings from specific User
 
-@api_view(['GET'])
-def getUserBooking(request, pk):
-    booking = Booking.objects.filter(customer_id__id = pk)
-    serializer = BookingSerializer(booking, many=True)
-    return Response(serializer.data)
+class GetUserBooking(DetailView):
+    model = User
+    template_name = "user_booking.html"
+
 
 # Get bookings from specific Barber
 
-
-@api_view(['GET'])
-def getBarberBooking(request, pk):
-    booking = Booking.objects.filter(barber_id__id=pk)
-    serializer = BookingSerializer(booking, many=True)
-    return Response(serializer.data)
+class GetBarberBooking(DetailView):
+    model = Barber
+    template_name = "barber_booking.html"
 
 # Update booking
 
-@api_view(['PUT'])
-def updateBooking(request, pk):
-    data = request.data
-    booking = Booking.objects.get(id=pk)
-    serializer = BookingSerializer(instance=booking, data=data)
 
-    if serializer.is_valid():
-        serializer.save()
-    return Response(serializer.data)
+class UpdateBooking(UpdateView):
+    model = Booking
+    fields = ('customer', 'barber',  'timeslot')
+    
+    template_name = "user_update.html"
 
 
 # Create booking
 
-@api_view(['POST'])
-def createBooking(request):
-    data = request.data
-  
-    booking = Booking.objects.create(
-       
-        customer_id = User.objects.get(id = data['customer_id']),
-        barber_id = Barber.objects.get(id = data["barber_id"]),
-        timeslot = data['timeslot'],
-        )
-    serializer = BookingSerializer(booking, many=False)
-    return Response(serializer.data)
+class CreateBooking(CreateView):
+    model = Booking
+
+    fields = '__all__'
+    template_name = "create_booking.html"
